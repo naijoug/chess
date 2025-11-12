@@ -88,7 +88,7 @@
   - 选择完成后 dispatch SELECT_MODE action
   - _需求: 1.1, 1.2, 1.3, 5.1_
 
-- [ ] 14. 实现 App 组件和路由逻辑
+- [x] 14. 实现 App 组件和路由逻辑
   - 创建 src/App.tsx 和全局样式
   - 使用 GameProvider 包裹应用
   - 根据 gameMode 状态显示 GameModeSelector 或游戏界面
