@@ -1,4 +1,4 @@
 // Chess game engine modules
 // This directory contains the core game logic
 
-export {};
+export { ChessEngine } from './ChessEngine';
