@@ -55,7 +55,7 @@
   - 创建 GameProvider 组件和 useGame hook
   - _需求: 1.3, 3.5, 7.1, 7.4, 7.5_
 
-- [ ] 10. 实现 Square 组件
+- [x] 10. 实现 Square 组件
   - 创建 src/components/Square.tsx 和对应的 CSS Module
   - 渲染单个棋盘格子，根据位置显示浅色或深色
   - 根据 props 显示棋子 SVG 图标（从 assets/chess-pieces 加载）
