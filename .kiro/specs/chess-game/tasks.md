@@ -6,7 +6,7 @@
   - 设置项目目录结构（src/components, src/engine, src/types, src/context, src/styles）
   - _需求: 1.1, 1.2, 1.3_
 
-- [ ] 2. 实现核心数据类型和模型
+- [x] 2. 实现核心数据类型和模型
   - 在 src/types/index.ts 中定义所有 TypeScript 类型（PieceColor, PieceType, Piece, Position, Board, Move, GameMode, GameState, MoveResult）
   - 创建类型工具函数（位置比较、棋盘深拷贝等）
   - _需求: 2.2, 3.1, 4.1_
