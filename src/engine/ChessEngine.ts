@@ -1,4 +1,4 @@
-import type { Board, Piece, Position, PieceColor, PieceType } from '../types';
+import type { Board, Piece, Position, PieceColor, PieceType, Move, MoveResult } from '../types';
 import { MoveValidator } from './MoveValidator';
 
 /**
@@ -281,6 +281,119 @@ export class ChessEngine {
     }
 
     return false; // 国王安全
+  }
+
+  /**
+   * 执行移动并返回移动结果
+   * 处理普通移动、吃子，更新hasMoved标记
+   * 
+   * @param board 当前棋盘
+   * @param from 起始位置
+   * @param to 目标位置
+   * @returns 移动结果，包含新棋盘状态和游戏状态检查结果
+   */
+  static makeMove(board: Board, from: Position, to: Position): MoveResult {
+    // 创建棋盘副本
+    const newBoard = this.cloneBoard(board);
+    
+    // 获取移动的棋子
+    const piece = newBoard[from.row][from.col];
+    if (!piece) {
+      throw new Error('No piece at source position');
+    }
+    
+    // 获取目标位置的棋子（如果有，则是吃子）
+    const capturedPiece = newBoard[to.row][to.col];
+    
+    // 创建移动对象
+    const move: Move = {
+      from: { ...from },
+      to: { ...to },
+      piece: { ...piece },
+      capturedPiece: capturedPiece ? { ...capturedPiece } : undefined
+    };
+    
+    // 执行移动：将棋子移动到目标位置
+    newBoard[to.row][to.col] = {
+      ...piece,
+      hasMoved: true // 更新hasMoved标记
+    };
+    
+    // 清空起始位置
+    newBoard[from.row][from.col] = null;
+    
+    // 检查移动后的游戏状态
+    const opponentColor: PieceColor = piece.color === 'white' ? 'black' : 'white';
+    const isCheck = this.isInCheck(newBoard, opponentColor);
+    const isCheckmate = isCheck && this.isCheckmate(newBoard, opponentColor);
+    const isStalemate = !isCheck && this.isStalemate(newBoard, opponentColor);
+    
+    // 返回移动结果
+    return {
+      newBoard,
+      move,
+      isCheck,
+      isCheckmate,
+      isStalemate
+    };
+  }
+
+  /**
+   * 检查指定颜色是否被将死
+   * 将死条件：国王被将军且没有任何合法移动可以解除将军
+   * 
+   * @param board 棋盘
+   * @param color 被检查的颜色
+   * @returns 是否被将死
+   */
+  static isCheckmate(board: Board, color: PieceColor): boolean {
+    // 如果没有被将军，则不可能是将死
+    if (!this.isInCheck(board, color)) {
+      return false;
+    }
+    
+    // 检查是否有任何合法移动可以解除将军
+    return !this.hasAnyValidMove(board, color);
+  }
+
+  /**
+   * 检查指定颜色是否僵局
+   * 僵局条件：没有被将军但没有任何合法移动
+   * 
+   * @param board 棋盘
+   * @param color 被检查的颜色
+   * @returns 是否僵局
+   */
+  static isStalemate(board: Board, color: PieceColor): boolean {
+    // 如果被将军，则不是僵局
+    if (this.isInCheck(board, color)) {
+      return false;
+    }
+    
+    // 检查是否有任何合法移动
+    return !this.hasAnyValidMove(board, color);
+  }
+
+  /**
+   * 检查指定颜色是否有任何合法移动
+   * 
+   * @param board 棋盘
+   * @param color 颜色
+   * @returns 是否有合法移动
+   */
+  private static hasAnyValidMove(board: Board, color: PieceColor): boolean {
+    // 获取所有己方棋子的位置
+    const positions = this.getAllPiecesPositions(board, color);
+    
+    // 检查每个棋子是否有合法移动
+    for (const position of positions) {
+      const validMoves = this.getValidMoves(board, position);
+      if (validMoves.length > 0) {
+        return true; // 找到至少一个合法移动
+      }
+    }
+    
+    return false; // 没有任何合法移动
   }
 
   /**
