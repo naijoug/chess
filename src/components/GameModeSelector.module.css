@@ -1,0 +1,204 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.content {
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 48px 0;
+  color: #2d3748;
+}
+
+.subtitle {
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 32px 0;
+  color: #2d3748;
+}
+
+/* 模式选择 */
+.modeSelection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modeButton {
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.modeButton:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+}
+
+.modeIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.modeTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.modeDescription {
+  font-size: 16px;
+  color: #718096;
+}
+
+/* 颜色选择 */
+.colorSelection {
+  display: flex;
+  flex-direction: column;
+}
+
+.colorOptions {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.colorButton {
+  flex: 1;
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 32px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.colorButton:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.colorButton.selected {
+  border-color: #667eea;
+  background: #f7fafc;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.colorIcon {
+  font-size: 72px;
+  margin-bottom: 16px;
+}
+
+.colorLabel {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.colorNote {
+  font-size: 14px;
+  color: #718096;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.backButton,
+.startButton {
+  flex: 1;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.backButton {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.backButton:hover {
+  background: #cbd5e0;
+}
+
+.startButton {
+  background: #667eea;
+  color: white;
+}
+
+.startButton:hover {
+  background: #5a67d8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .content {
+    padding: 32px 24px;
+  }
+
+  .title {
+    font-size: 36px;
+    margin-bottom: 32px;
+  }
+
+  .subtitle {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .modeButton {
+    padding: 24px;
+  }
+
+  .modeIcon {
+    font-size: 48px;
+  }
+
+  .modeTitle {
+    font-size: 20px;
+  }
+
+  .colorOptions {
+    flex-direction: column;
+  }
+
+  .colorIcon {
+    font-size: 56px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

@@ -4,3 +4,4 @@
 export { default as Square } from './Square';
 export { default as ChessBoard } from './ChessBoard';
 export { GameControls } from './GameControls';
+export { GameModeSelector } from './GameModeSelector';

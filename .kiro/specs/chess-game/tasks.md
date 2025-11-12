@@ -81,7 +81,7 @@
   - 实现"返回菜单"按钮，dispatch BACK_TO_MENU action
   - _需求: 7.1, 7.2, 7.3, 7.4, 7.5, 8.3_
 
-- [ ] 13. 实现 GameModeSelector 组件
+- [x] 13. 实现 GameModeSelector 组件
   - 创建 src/components/GameModeSelector.tsx 和对应的 CSS Module
   - 显示"人机对战"和"双人对战"两个选项按钮
   - 人机对战模式下显示颜色选择（白方/黑方）
