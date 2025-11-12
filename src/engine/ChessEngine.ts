@@ -165,16 +165,17 @@ export class ChessEngine {
    * 
    * @param board 棋盘
    * @param position 棋子位置
+   * @param lastMove 上一步移动（用于吃过路兵判断）
    * @returns 所有合法移动的目标位置数组
    */
-  static getValidMoves(board: Board, position: Position): Position[] {
+  static getValidMoves(board: Board, position: Position, lastMove?: Move | null): Position[] {
     const piece = this.getPieceAt(board, position);
     if (!piece) {
       return [];
     }
 
     // 获取所有可能的移动位置（基于棋子移动规则）
-    const possibleMoves = this.getPossibleMoves(board, position);
+    const possibleMoves = this.getPossibleMoves(board, position, lastMove);
 
     // 过滤掉会导致己方国王被将军的移动
     const validMoves = possibleMoves.filter(targetPos => {
@@ -190,10 +191,16 @@ export class ChessEngine {
    * 
    * @param board 棋盘
    * @param from 起始位置
+   * @param lastMove 上一步移动（用于吃过路兵判断）
    * @returns 可能的移动位置数组
    */
-  private static getPossibleMoves(board: Board, from: Position): Position[] {
+  private static getPossibleMoves(board: Board, from: Position, lastMove?: Move | null): Position[] {
     const moves: Position[] = [];
+    const piece = this.getPieceAt(board, from);
+    
+    if (!piece) {
+      return moves;
+    }
 
     // 遍历棋盘上所有位置，检查是否可以移动到该位置
     for (let row = 0; row < 8; row++) {
@@ -205,6 +212,19 @@ export class ChessEngine {
           moves.push(to);
         }
       }
+    }
+
+    // 添加特殊移动
+    // 王车易位
+    if (piece.type === 'king') {
+      const castlingMoves = this.getCastlingMoves(board, piece.color);
+      moves.push(...castlingMoves);
+    }
+
+    // 吃过路兵
+    if (piece.type === 'pawn' && lastMove) {
+      const enPassantMoves = this.getEnPassantMoves(board, from, piece.color, lastMove);
+      moves.push(...enPassantMoves);
     }
 
     return moves;
@@ -285,14 +305,22 @@ export class ChessEngine {
 
   /**
    * 执行移动并返回移动结果
-   * 处理普通移动、吃子，更新hasMoved标记
+   * 处理普通移动、吃子、王车易位、吃过路兵、兵升变，更新hasMoved标记
    * 
    * @param board 当前棋盘
    * @param from 起始位置
    * @param to 目标位置
+   * @param lastMove 上一步移动（用于吃过路兵判断）
+   * @param promotionType 兵升变类型（可选）
    * @returns 移动结果，包含新棋盘状态和游戏状态检查结果
    */
-  static makeMove(board: Board, from: Position, to: Position): MoveResult {
+  static makeMove(
+    board: Board, 
+    from: Position, 
+    to: Position, 
+    lastMove?: Move | null,
+    promotionType?: PieceType
+  ): MoveResult {
     // 创建棋盘副本
     const newBoard = this.cloneBoard(board);
     
@@ -303,7 +331,7 @@ export class ChessEngine {
     }
     
     // 获取目标位置的棋子（如果有，则是吃子）
-    const capturedPiece = newBoard[to.row][to.col];
+    let capturedPiece = newBoard[to.row][to.col];
     
     // 创建移动对象
     const move: Move = {
@@ -313,14 +341,52 @@ export class ChessEngine {
       capturedPiece: capturedPiece ? { ...capturedPiece } : undefined
     };
     
-    // 执行移动：将棋子移动到目标位置
-    newBoard[to.row][to.col] = {
-      ...piece,
-      hasMoved: true // 更新hasMoved标记
-    };
-    
-    // 清空起始位置
-    newBoard[from.row][from.col] = null;
+    // 检查是否是王车易位
+    if (piece.type === 'king' && Math.abs(to.col - from.col) === 2) {
+      move.isCastling = true;
+      this.executeCastling(newBoard, from, to, piece.color);
+    }
+    // 检查是否是吃过路兵
+    else if (piece.type === 'pawn' && this.canEnPassant(board, from, to, lastMove)) {
+      move.isEnPassant = true;
+      // 吃过路兵：移动兵并移除被吃的兵
+      const capturedPawnRow = from.row;
+      const capturedPawnCol = to.col;
+      capturedPiece = newBoard[capturedPawnRow][capturedPawnCol];
+      move.capturedPiece = capturedPiece ? { ...capturedPiece } : undefined;
+      
+      newBoard[to.row][to.col] = {
+        ...piece,
+        hasMoved: true
+      };
+      newBoard[from.row][from.col] = null;
+      newBoard[capturedPawnRow][capturedPawnCol] = null;
+    }
+    // 普通移动
+    else {
+      // 执行移动：将棋子移动到目标位置
+      let movedPiece = {
+        ...piece,
+        hasMoved: true
+      };
+      
+      // 检查是否是兵升变
+      if (piece.type === 'pawn') {
+        const promotionRow = piece.color === 'white' ? 0 : 7;
+        if (to.row === promotionRow) {
+          // 兵到达对方底线，升变
+          const finalPromotionType = promotionType || 'queen'; // 默认升变为后
+          movedPiece = {
+            ...movedPiece,
+            type: finalPromotionType
+          };
+          move.promotionType = finalPromotionType;
+        }
+      }
+      
+      newBoard[to.row][to.col] = movedPiece;
+      newBoard[from.row][from.col] = null;
+    }
     
     // 检查移动后的游戏状态
     const opponentColor: PieceColor = piece.color === 'white' ? 'black' : 'white';
@@ -408,5 +474,207 @@ export class ChessEngine {
         piece ? { ...piece } : null
       )
     );
+  }
+
+  // ==================== 特殊移动规则 ====================
+
+  /**
+   * 检查是否可以进行王车易位
+   * 
+   * @param board 棋盘
+   * @param color 颜色
+   * @param side 王侧或后侧
+   * @returns 是否可以王车易位
+   */
+  static canCastle(board: Board, color: PieceColor, side: 'kingside' | 'queenside'): boolean {
+    const row = color === 'white' ? 7 : 0;
+    const kingCol = 4;
+    const rookCol = side === 'kingside' ? 7 : 0;
+    
+    // 检查国王和车是否在初始位置且未移动
+    const king = board[row][kingCol];
+    const rook = board[row][rookCol];
+    
+    if (!king || king.type !== 'king' || king.color !== color || king.hasMoved) {
+      return false;
+    }
+    
+    if (!rook || rook.type !== 'rook' || rook.color !== color || rook.hasMoved) {
+      return false;
+    }
+    
+    // 检查国王和车之间的格子是否为空
+    const startCol = Math.min(kingCol, rookCol) + 1;
+    const endCol = Math.max(kingCol, rookCol);
+    
+    for (let col = startCol; col < endCol; col++) {
+      if (board[row][col] !== null) {
+        return false;
+      }
+    }
+    
+    // 检查国王当前位置是否被将军
+    if (this.isInCheck(board, color)) {
+      return false;
+    }
+    
+    // 检查国王经过的格子和目标格子是否被攻击
+    const direction = side === 'kingside' ? 1 : -1;
+    const kingTargetCol = kingCol + 2 * direction;
+    
+    for (let col = kingCol; col !== kingTargetCol + direction; col += direction) {
+      if (col === kingCol) continue; // 已经检查过当前位置
+      
+      const testBoard = this.cloneBoard(board);
+      testBoard[row][col] = testBoard[row][kingCol];
+      testBoard[row][kingCol] = null;
+      
+      if (this.isInCheck(testBoard, color)) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  /**
+   * 获取王车易位的所有可能移动
+   * 
+   * @param board 棋盘
+   * @param color 颜色
+   * @returns 王车易位的目标位置数组
+   */
+  private static getCastlingMoves(board: Board, color: PieceColor): Position[] {
+    const moves: Position[] = [];
+    const row = color === 'white' ? 7 : 0;
+    
+    // 检查王侧易位
+    if (this.canCastle(board, color, 'kingside')) {
+      moves.push({ row, col: 6 });
+    }
+    
+    // 检查后侧易位
+    if (this.canCastle(board, color, 'queenside')) {
+      moves.push({ row, col: 2 });
+    }
+    
+    return moves;
+  }
+
+  /**
+   * 执行王车易位
+   * 
+   * @param board 棋盘（会被修改）
+   * @param from 国王起始位置
+   * @param to 国王目标位置
+   * @param color 颜色
+   */
+  private static executeCastling(board: Board, from: Position, to: Position, color: PieceColor): void {
+    const row = color === 'white' ? 7 : 0;
+    const isKingside = to.col > from.col;
+    
+    // 移动国王
+    const king = board[from.row][from.col];
+    board[to.row][to.col] = {
+      ...king!,
+      hasMoved: true
+    };
+    board[from.row][from.col] = null;
+    
+    // 移动车
+    const rookFromCol = isKingside ? 7 : 0;
+    const rookToCol = isKingside ? 5 : 3;
+    const rook = board[row][rookFromCol];
+    board[row][rookToCol] = {
+      ...rook!,
+      hasMoved: true
+    };
+    board[row][rookFromCol] = null;
+  }
+
+  /**
+   * 检查是否可以吃过路兵
+   * 
+   * @param board 棋盘
+   * @param from 兵的起始位置
+   * @param to 兵的目标位置
+   * @param lastMove 上一步移动
+   * @returns 是否可以吃过路兵
+   */
+  static canEnPassant(board: Board, from: Position, to: Position, lastMove?: Move | null): boolean {
+    if (!lastMove) {
+      return false;
+    }
+    
+    const piece = this.getPieceAt(board, from);
+    if (!piece || piece.type !== 'pawn') {
+      return false;
+    }
+    
+    // 检查上一步移动是否是对方兵的两格移动
+    const lastPiece = lastMove.piece;
+    if (lastPiece.type !== 'pawn') {
+      return false;
+    }
+    
+    // 检查是否是两格移动
+    const rowDiff = Math.abs(lastMove.to.row - lastMove.from.row);
+    if (rowDiff !== 2) {
+      return false;
+    }
+    
+    // 检查对方兵是否在己方兵的旁边
+    if (lastMove.to.row !== from.row) {
+      return false;
+    }
+    
+    if (Math.abs(lastMove.to.col - from.col) !== 1) {
+      return false;
+    }
+    
+    // 检查目标位置是否正确（对方兵后面的格子）
+    const direction = piece.color === 'white' ? -1 : 1;
+    const expectedToRow = from.row + direction;
+    const expectedToCol = lastMove.to.col;
+    
+    return to.row === expectedToRow && to.col === expectedToCol;
+  }
+
+  /**
+   * 获取吃过路兵的所有可能移动
+   * 
+   * @param board 棋盘
+   * @param pawnPos 兵的位置
+   * @param color 颜色
+   * @param lastMove 上一步移动
+   * @returns 吃过路兵的目标位置数组
+   */
+  private static getEnPassantMoves(
+    board: Board, 
+    pawnPos: Position, 
+    color: PieceColor, 
+    lastMove: Move
+  ): Position[] {
+    const moves: Position[] = [];
+    const direction = color === 'white' ? -1 : 1;
+    
+    // 检查左侧和右侧
+    for (const colOffset of [-1, 1]) {
+      const targetCol = pawnPos.col + colOffset;
+      if (targetCol < 0 || targetCol >= 8) {
+        continue;
+      }
+      
+      const targetPos: Position = {
+        row: pawnPos.row + direction,
+        col: targetCol
+      };
+      
+      if (this.canEnPassant(board, pawnPos, targetPos, lastMove)) {
+        moves.push(targetPos);
+      }
+    }
+    
+    return moves;
   }
 }
