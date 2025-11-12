@@ -17,7 +17,7 @@
   - 实现棋盘工具函数（获取指定位置棋子、检查位置是否在棋盘内等）
   - _需求: 2.2, 4.1_
 
-- [ ] 4. 实现移动验证器
+- [x] 4. 实现移动验证器
   - 创建 src/engine/MoveValidator.ts
   - 实现每种棋子的移动规则验证方法（validatePawnMove, validateKnightMove, validateBishopMove, validateRookMove, validateQueenMove, validateKingMove）
   - 实现 isPathClear() 方法检查移动路径是否被阻挡
