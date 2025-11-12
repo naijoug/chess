@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, useEffect, Dispatch } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import type { Dispatch } from 'react';
 import type { GameState, GameMode, PieceColor, Position, Move } from '../types';
 import { ChessEngine } from '../engine/ChessEngine';
 import { positionsEqual } from '../types';

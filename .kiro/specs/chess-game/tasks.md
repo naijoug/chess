@@ -72,7 +72,7 @@
   - 实现响应式布局
   - _需求: 2.1, 2.2, 2.4, 2.5, 3.1, 3.2, 3.3_
 
-- [ ] 12. 实现 GameControls 组件
+- [x] 12. 实现 GameControls 组件
   - 创建 src/components/GameControls.tsx 和对应的 CSS Module
   - 显示当前回合（白方/黑方）
   - 显示游戏状态（进行中、将军、将死、和棋）
