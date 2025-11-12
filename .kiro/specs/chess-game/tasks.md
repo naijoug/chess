@@ -1,6 +1,6 @@
 # 实施计划
 
-- [ ] 1. 初始化项目和配置
+- [-] 1. 初始化项目和配置
   - 使用 Vite 创建 React + TypeScript 项目
   - 配置 TypeScript 严格模式
   - 设置项目目录结构（src/components, src/engine, src/types, src/context, src/styles）
