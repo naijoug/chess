@@ -48,7 +48,7 @@
   - 实现兵升变逻辑
   - _需求: 4.6, 4.7_
 
-- [ ] 9. 实现状态管理
+- [x] 9. 实现状态管理
   - 创建 src/context/GameContext.tsx
   - 定义 GameAction 类型和所有 action 类型
   - 实现 gameReducer 处理所有状态更新逻辑
