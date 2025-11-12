@@ -1,0 +1,123 @@
+.chessBoardContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+}
+
+.chessBoard {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: min(80vw, 80vh, 600px);
+  height: min(80vw, 80vh, 600px);
+  border: 2px solid #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 列标记（a-h） */
+.columnLabels {
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  height: 20px;
+}
+
+.columnLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  user-select: none;
+}
+
+/* 行标记（1-8） */
+.rowLabels {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -25px;
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  width: 20px;
+}
+
+.rowLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  user-select: none;
+}
+
+/* 响应式设计 - 移动端 */
+@media (max-width: 768px) {
+  .chessBoardContainer {
+    padding: 10px;
+  }
+
+  .chessBoard {
+    width: min(95vw, 95vh, 500px);
+    height: min(95vw, 95vh, 500px);
+  }
+
+  .columnLabels {
+    bottom: -20px;
+    height: 16px;
+  }
+
+  .columnLabel {
+    font-size: 12px;
+  }
+
+  .rowLabels {
+    left: -20px;
+    width: 16px;
+  }
+
+  .rowLabel {
+    font-size: 12px;
+  }
+}
+
+/* 响应式设计 - 小屏幕 */
+@media (max-width: 480px) {
+  .chessBoardContainer {
+    padding: 5px;
+  }
+
+  .chessBoard {
+    width: 100vw;
+    height: 100vw;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .columnLabels {
+    bottom: -18px;
+    height: 14px;
+  }
+
+  .columnLabel {
+    font-size: 10px;
+  }
+
+  .rowLabels {
+    left: -18px;
+    width: 14px;
+  }
+
+  .rowLabel {
+    font-size: 10px;
+  }
+}

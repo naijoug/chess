@@ -63,7 +63,7 @@
   - 添加点击事件处理
   - _需求: 2.1, 2.3, 3.1, 8.2_
 
-- [ ] 11. 实现 ChessBoard 组件
+- [x] 11. 实现 ChessBoard 组件
   - 创建 src/components/ChessBoard.tsx 和对应的 CSS Module
   - 渲染 8x8 棋盘网格，使用 Square 组件
   - 显示棋盘坐标标记（a-h 列和 1-8 行）
