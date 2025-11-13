@@ -137,7 +137,7 @@
   - 使用 useCallback 优化事件处理函数
   - _需求: 8.5_
 
-- [ ] 21. 编写单元测试
+- [x] 21. 编写单元测试
   - 为 ChessEngine 编写测试（初始化、移动规则、将军检测等）
   - 为 MoveValidator 编写测试
   - 为 AIEngine 编写测试
