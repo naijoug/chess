@@ -15,6 +15,15 @@ const ChessBoard: React.FC = () => {
       return;
     }
 
+    // 在 AI 模式下，如果不是玩家的回合，不处理点击
+    if (state.gameMode === 'ai' && state.playerColor !== state.currentTurn) {
+      return;
+    }
+
+    // 在双人模式下，确保只有当前回合的玩家可以操作
+    // 这个检查主要在 reducer 中进行，这里只是额外的前端验证
+    const clickedPiece = state.board[position.row][position.col];
+    
     // 如果有选中的格子且点击的是合法移动位置，执行移动
     if (state.selectedSquare && state.validMoves.some((move: Position) => positionsEqual(move, position))) {
       dispatch({
@@ -25,6 +34,11 @@ const ChessBoard: React.FC = () => {
         }
       });
     } else {
+      // 在双人模式下，如果点击的是对方的棋子，不做任何操作
+      if (state.gameMode === 'pvp' && clickedPiece && clickedPiece.color !== state.currentTurn) {
+        return;
+      }
+
       // 否则，选择/取消选择格子
       dispatch({
         type: 'SELECT_SQUARE',

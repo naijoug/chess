@@ -67,6 +67,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         return state;
       }
 
+      // 在 AI 模式下，只允许玩家在自己的回合操作
+      if (state.gameMode === 'ai' && state.playerColor !== state.currentTurn) {
+        return state;
+      }
+
       // 如果点击的是已选中的格子，取消选择
       if (state.selectedSquare && positionsEqual(state.selectedSquare, position)) {
         return {
@@ -84,12 +89,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       // 如果点击的是己方棋子，选中它
+      // 在双人模式下，只允许当前回合的玩家选择自己的棋子
       if (piece && piece.color === state.currentTurn) {
-        // 在 AI 模式下，只允许玩家移动自己的棋子
-        if (state.gameMode === 'ai' && state.playerColor !== state.currentTurn) {
-          return state;
-        }
-
         const validMoves = ChessEngine.getValidMoves(state.board, position, state.lastMove);
         return {
           ...state,
@@ -108,6 +109,19 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'MAKE_MOVE': {
       const { from, to, promotionType } = action.payload;
+
+      // 获取移动的棋子
+      const movingPiece = ChessEngine.getPieceAt(state.board, from);
+      
+      // 验证是否是当前回合的玩家在移动
+      if (!movingPiece || movingPiece.color !== state.currentTurn) {
+        return state; // 不是当前回合的棋子，不执行
+      }
+
+      // 在 AI 模式下，只允许玩家在自己的回合移动
+      if (state.gameMode === 'ai' && state.playerColor !== state.currentTurn) {
+        return state;
+      }
 
       // 验证移动是否合法
       const validMoves = ChessEngine.getValidMoves(state.board, from, state.lastMove);
