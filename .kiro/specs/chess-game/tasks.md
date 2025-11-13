@@ -101,7 +101,7 @@
   - 在 ChessBoard 组件中添加回合检查逻辑
   - _需求: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 16. 实现 AI 引擎
+- [x] 16. 实现 AI 引擎
   - 创建 src/engine/AIEngine.ts
   - 实现棋盘评估函数 evaluateBoard()（基于棋子价值和位置）
   - 实现 Minimax 算法（带 Alpha-Beta 剪枝）

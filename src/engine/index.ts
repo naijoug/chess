@@ -3,3 +3,4 @@
 
 export { ChessEngine } from './ChessEngine';
 export { MoveValidator } from './MoveValidator';
+export { AIEngine } from './AIEngine';
