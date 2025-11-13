@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Square from './Square';
 import { useGame } from '../context/GameContext';
 import { positionsEqual } from '../types';
@@ -8,8 +8,8 @@ import styles from './ChessBoard.module.css';
 const ChessBoard: React.FC = () => {
   const { state, dispatch } = useGame();
 
-  // 处理格子点击事件
-  const handleSquareClick = (position: Position) => {
+  // 使用 useCallback 优化事件处理函数，避免每次渲染都创建新函数
+  const handleSquareClick = useCallback((position: Position) => {
     // 如果游戏已结束，不处理点击
     if (state.isCheckmate || state.isStalemate) {
       return;
@@ -45,64 +45,69 @@ const ChessBoard: React.FC = () => {
         payload: position
       });
     }
-  };
+  }, [state.isCheckmate, state.isStalemate, state.gameMode, state.playerColor, state.currentTurn, state.board, state.selectedSquare, state.validMoves, dispatch]);
 
   // 判断格子是否为浅色
-  const isLightSquare = (row: number, col: number): boolean => {
+  const isLightSquare = useCallback((row: number, col: number): boolean => {
     return (row + col) % 2 === 0;
-  };
+  }, []);
 
   // 获取列标记（a-h）
-  const getColumnLabel = (col: number): string => {
+  const getColumnLabel = useCallback((col: number): string => {
     return String.fromCharCode(97 + col); // 97 是 'a' 的 ASCII 码
-  };
+  }, []);
 
   // 获取行标记（1-8）
-  const getRowLabel = (row: number): string => {
+  const getRowLabel = useCallback((row: number): string => {
     return String(8 - row); // row 0 对应第 8 行
-  };
+  }, []);
+
+  // 使用 useMemo 缓存棋盘格子的渲染，避免不必要的重新计算
+  const boardSquares = useMemo(() => {
+    return Array.from({ length: 8 }, (_, row) => (
+      <React.Fragment key={row}>
+        {Array.from({ length: 8 }, (_, col) => {
+          const position: Position = { row, col };
+          const piece = state.board[row][col];
+          const isSelected = state.selectedSquare !== null && positionsEqual(state.selectedSquare, position);
+          const isValidMove = state.validMoves.some((move: Position) => positionsEqual(move, position));
+          const isLight = isLightSquare(row, col);
+          
+          // 检查是否是被将军的国王
+          const isCheck = state.isCheck && 
+            piece !== null && 
+            piece.type === 'king' && 
+            piece.color === state.currentTurn;
+          
+          // 检查是否是上一步移动的格子
+          const isLastMoveSquare = state.lastMove !== null && (
+            positionsEqual(state.lastMove.from, position) || 
+            positionsEqual(state.lastMove.to, position)
+          );
+
+          return (
+            <Square
+              key={`${row}-${col}`}
+              position={position}
+              piece={piece}
+              isSelected={isSelected}
+              isValidMove={isValidMove}
+              isLight={isLight}
+              isCheck={isCheck}
+              isLastMoveSquare={isLastMoveSquare}
+              onClick={() => handleSquareClick(position)}
+            />
+          );
+        })}
+      </React.Fragment>
+    ));
+  }, [state.board, state.selectedSquare, state.validMoves, state.isCheck, state.currentTurn, state.lastMove, isLightSquare, handleSquareClick]);
 
   return (
     <div className={styles.chessBoardContainer}>
       <div className={styles.chessBoard}>
         {/* 渲染 8x8 棋盘 */}
-        {Array.from({ length: 8 }, (_, row) => (
-          <React.Fragment key={row}>
-            {Array.from({ length: 8 }, (_, col) => {
-              const position: Position = { row, col };
-              const piece = state.board[row][col];
-              const isSelected = state.selectedSquare !== null && positionsEqual(state.selectedSquare, position);
-              const isValidMove = state.validMoves.some((move: Position) => positionsEqual(move, position));
-              const isLight = isLightSquare(row, col);
-              
-              // 检查是否是被将军的国王
-              const isCheck = state.isCheck && 
-                piece !== null && 
-                piece.type === 'king' && 
-                piece.color === state.currentTurn;
-              
-              // 检查是否是上一步移动的格子
-              const isLastMoveSquare = state.lastMove !== null && (
-                positionsEqual(state.lastMove.from, position) || 
-                positionsEqual(state.lastMove.to, position)
-              );
-
-              return (
-                <Square
-                  key={`${row}-${col}`}
-                  position={position}
-                  piece={piece}
-                  isSelected={isSelected}
-                  isValidMove={isValidMove}
-                  isLight={isLight}
-                  isCheck={isCheck}
-                  isLastMoveSquare={isLastMoveSquare}
-                  onClick={() => handleSquareClick(position)}
-                />
-              );
-            })}
-          </React.Fragment>
-        ))}
+        {boardSquares}
 
         {/* 列标记（a-h） */}
         <div className={styles.columnLabels}>

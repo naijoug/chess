@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Piece, Position } from '../types';
 import styles from './Square.module.css';
 
@@ -30,17 +30,19 @@ const Square: React.FC<SquareProps> = ({
     return `/assets/chess-pieces/${color}-${type}.svg`;
   };
 
-  // 组合 CSS 类名
-  const squareClasses = [
-    styles.square,
-    isLight ? styles.light : styles.dark,
-    isSelected ? styles.selected : '',
-    isValidMove ? styles.validMove : '',
-    isCheck ? styles.check : '',
-    isLastMoveSquare ? styles.lastMove : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  // 使用 useMemo 缓存 CSS 类名计算
+  const squareClasses = useMemo(() => {
+    return [
+      styles.square,
+      isLight ? styles.light : styles.dark,
+      isSelected ? styles.selected : '',
+      isValidMove ? styles.validMove : '',
+      isCheck ? styles.check : '',
+      isLastMoveSquare ? styles.lastMove : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }, [isLight, isSelected, isValidMove, isCheck, isLastMoveSquare]);
 
   return (
     <div className={squareClasses} onClick={onClick}>
@@ -57,4 +59,5 @@ const Square: React.FC<SquareProps> = ({
   );
 };
 
-export default Square;
+// 使用 React.memo 优化 Square 组件，避免不必要的重新渲染
+export default React.memo(Square);

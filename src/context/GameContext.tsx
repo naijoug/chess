@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useMemo } from 'react';
 import type { Dispatch } from 'react';
 import type { GameState, GameMode, PieceColor, Position, Move } from '../types';
 import { ChessEngine } from '../engine/ChessEngine';
@@ -315,10 +315,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.gameMode, state.playerColor, state.currentTurn, state.isCheckmate, state.isStalemate, state.board, dispatch]);
 
-  const value: GameContextType = {
+  // 使用 useMemo 缓存 context value，避免不必要的重新渲染
+  const value: GameContextType = useMemo(() => ({
     state,
     dispatch
-  };
+  }), [state, dispatch]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }
