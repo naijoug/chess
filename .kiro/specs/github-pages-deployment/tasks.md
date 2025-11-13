@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. 配置 Vite 构建设置以支持 GitHub Pages
+- [x] 1. 配置 Vite 构建设置以支持 GitHub Pages
   - 修改 `vite.config.ts` 添加 base path 配置
   - 确保 base path 与 GitHub 仓库名称匹配
   - _Requirements: 1.2, 1.3_
