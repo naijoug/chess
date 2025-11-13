@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { Dispatch } from 'react';
 import type { GameState, GameMode, PieceColor, Position, Move } from '../types';
 import { ChessEngine } from '../engine/ChessEngine';
+import { AIEngine } from '../engine/AIEngine';
 import { positionsEqual } from '../types';
 
 // ==================== Action Types ====================
@@ -279,16 +280,40 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       !state.isCheckmate &&
       !state.isStalemate
     ) {
-      // 延迟执行 AI 移动，使其更自然
+      // 延迟执行 AI 移动，使其更自然（500ms-1000ms）
+      const delay = 500 + Math.random() * 500; // 随机延迟 500-1000ms
+      
       const timeoutId = setTimeout(() => {
-        // TODO: 在任务 16-17 中实现 AI 引擎后，这里将调用 AIEngine.calculateBestMove()
-        // 目前暂时不执行任何操作
-        console.log('AI turn - AI engine not yet implemented');
-      }, 800);
+        try {
+          // 调用 AI 引擎计算最佳移动
+          const bestMove = AIEngine.calculateBestMove(state.board, state.currentTurn, 3);
+          
+          if (bestMove) {
+            // 执行 AI 移动
+            dispatch({ type: 'AI_MOVE', payload: bestMove });
+          } else {
+            // 如果 AI 无法计算出移动（理论上不应该发生），记录错误
+            console.error('AI failed to calculate a move');
+          }
+        } catch (error) {
+          // 处理 AI 计算超时或其他错误
+          console.error('AI calculation error:', error);
+          
+          // 降级方案：使用更浅的搜索深度重试
+          try {
+            const fallbackMove = AIEngine.calculateBestMove(state.board, state.currentTurn, 2);
+            if (fallbackMove) {
+              dispatch({ type: 'AI_MOVE', payload: fallbackMove });
+            }
+          } catch (fallbackError) {
+            console.error('AI fallback calculation also failed:', fallbackError);
+          }
+        }
+      }, delay);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [state.gameMode, state.playerColor, state.currentTurn, state.isCheckmate, state.isStalemate]);
+  }, [state.gameMode, state.playerColor, state.currentTurn, state.isCheckmate, state.isStalemate, state.board, dispatch]);
 
   const value: GameContextType = {
     state,

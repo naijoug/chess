@@ -108,7 +108,7 @@
   - 实现 calculateBestMove() 方法，搜索深度设为 3
   - _需求: 5.3, 5.4_
 
-- [ ] 17. 集成 AI 到游戏流程
+- [x] 17. 集成 AI 到游戏流程
   - 在 gameReducer 或使用 useEffect 检测 AI 回合
   - 调用 AIEngine.calculateBestMove() 计算 AI 移动
   - 添加延迟（500ms-1000ms）使 AI 移动更自然
