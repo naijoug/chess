@@ -7,6 +7,7 @@
   justify-content: center;
   padding: 1rem;
   box-sizing: border-box;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 /* 游戏容器 */
@@ -18,31 +19,58 @@
   align-items: center;
 }
 
-/* 游戏内容布局 */
+/* 游戏内容布局 - 使用 CSS Grid */
 .game-content {
-  display: flex;
+  display: grid;
   gap: 2rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  justify-content: center;
+  width: 100%;
+  align-items: start;
+  justify-items: center;
 }
 
-/* 桌面端布局 */
+/* 桌面端布局 - 棋盘居中，控制面板在侧边 */
 @media (min-width: 1024px) {
   .game-content {
-    flex-wrap: nowrap;
+    grid-template-columns: 1fr auto;
+    max-width: 1200px;
+    align-items: center;
   }
 }
 
-/* 移动端布局 */
+/* 平板端布局 */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .game-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    max-width: 700px;
+  }
+  
+  .app {
+    padding: 1.5rem;
+  }
+}
+
+/* 移动端布局 - 棋盘占满宽度，控制面板在底部 */
 @media (max-width: 768px) {
   .app {
     padding: 0.5rem;
   }
 
   .game-content {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
     gap: 1rem;
     width: 100%;
+  }
+}
+
+/* 小屏幕移动端 */
+@media (max-width: 480px) {
+  .app {
+    padding: 0.25rem;
+  }
+
+  .game-content {
+    gap: 0.75rem;
   }
 }

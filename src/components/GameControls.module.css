@@ -3,10 +3,11 @@
   flex-direction: column;
   gap: 2rem;
   padding: 2rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 280px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 350px;
 }
 
 /* 状态信息区域 */
@@ -106,20 +107,74 @@
   box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
 }
 
-/* 响应式设计 */
+/* 桌面端 - 控制面板在侧边 */
+@media (min-width: 1024px) {
+  .container {
+    min-width: 320px;
+    max-width: 350px;
+  }
+}
+
+/* 平板端 */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .container {
+    min-width: auto;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .controlButtons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* 移动端 - 控制面板在底部，占满宽度 */
 @media (max-width: 768px) {
   .container {
     min-width: auto;
+    max-width: 100%;
     width: 100%;
     padding: 1.5rem;
+    gap: 1.5rem;
   }
 
   .turnText {
     font-size: 1.25rem;
   }
 
+  .controlButtons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
   .button {
-    padding: 0.65rem 1.25rem;
+    padding: 0.65rem 1rem;
     font-size: 0.95rem;
+  }
+}
+
+/* 小屏幕移动端 */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+    gap: 1rem;
+    border-radius: 8px;
+  }
+
+  .turnText {
+    font-size: 1.1rem;
+  }
+
+  .statusLabel,
+  .statusValue {
+    font-size: 0.9rem;
+  }
+
+  .button {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
   }
 }
