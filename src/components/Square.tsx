@@ -8,6 +8,8 @@ interface SquareProps {
   isSelected: boolean;
   isValidMove: boolean;
   isLight: boolean;
+  isCheck: boolean; // 是否是被将军的国王
+  isLastMoveSquare: boolean; // 是否是上一步移动的格子
   onClick: () => void;
 }
 
@@ -16,6 +18,8 @@ const Square: React.FC<SquareProps> = ({
   isSelected,
   isValidMove,
   isLight,
+  isCheck,
+  isLastMoveSquare,
   onClick,
 }) => {
   // 获取棋子 SVG 图标路径
@@ -32,6 +36,8 @@ const Square: React.FC<SquareProps> = ({
     isLight ? styles.light : styles.dark,
     isSelected ? styles.selected : '',
     isValidMove ? styles.validMove : '',
+    isCheck ? styles.check : '',
+    isLastMoveSquare ? styles.lastMove : '',
   ]
     .filter(Boolean)
     .join(' ');

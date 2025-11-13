@@ -74,6 +74,18 @@ const ChessBoard: React.FC = () => {
               const isSelected = state.selectedSquare !== null && positionsEqual(state.selectedSquare, position);
               const isValidMove = state.validMoves.some((move: Position) => positionsEqual(move, position));
               const isLight = isLightSquare(row, col);
+              
+              // 检查是否是被将军的国王
+              const isCheck = state.isCheck && 
+                piece !== null && 
+                piece.type === 'king' && 
+                piece.color === state.currentTurn;
+              
+              // 检查是否是上一步移动的格子
+              const isLastMoveSquare = state.lastMove !== null && (
+                positionsEqual(state.lastMove.from, position) || 
+                positionsEqual(state.lastMove.to, position)
+              );
 
               return (
                 <Square
@@ -83,6 +95,8 @@ const ChessBoard: React.FC = () => {
                   isSelected={isSelected}
                   isValidMove={isValidMove}
                   isLight={isLight}
+                  isCheck={isCheck}
+                  isLastMoveSquare={isLastMoveSquare}
                   onClick={() => handleSquareClick(position)}
                 />
               );
