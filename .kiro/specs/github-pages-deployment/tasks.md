@@ -5,7 +5,7 @@
   - 确保 base path 与 GitHub 仓库名称匹配
   - _Requirements: 1.2, 1.3_
 
-- [ ] 2. 创建 GitHub Actions 部署工作流
+- [x] 2. 创建 GitHub Actions 部署工作流
   - 创建 `.github/workflows/deploy.yml` 文件
   - 配置工作流触发条件（推送到 main 分支）
   - 添加 checkout 代码步骤
