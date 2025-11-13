@@ -143,7 +143,7 @@
   - 为 AIEngine 编写测试
   - _需求: 4.1, 4.2, 4.3, 4.4, 5.3_
 
-- [ ] 22. 编写组件测试
+- [x] 22. 编写组件测试
   - 为 ChessBoard 组件编写测试
   - 为 GameControls 组件编写测试
   - 为 GameModeSelector 组件编写测试
