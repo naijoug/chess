@@ -25,9 +25,9 @@ const Square: React.FC<SquareProps> = ({
   // 获取棋子 SVG 图标路径
   const getPieceIcon = (piece: Piece): string => {
     const color = piece.color;
-    // 注意：SVG 文件中 queen 命名为 queue
-    const type = piece.type === 'queen' ? 'queue' : piece.type;
-    return `/assets/chess-pieces/${color}-${type}.svg`;
+    const type = piece.type;
+    // 使用 Vite 的动态导入路径，相对于 src 目录
+    return new URL(`../assets/chess-pieces/${color}-${type}.svg`, import.meta.url).href;
   };
 
   // 使用 useMemo 缓存 CSS 类名计算
