@@ -110,15 +110,25 @@ const ChessBoard: React.FC = () => {
         ArrowRight: { row: 0, col: 1 },
       };
 
+      let nextRow = currentRow;
+      let nextCol = currentCol;
+
       const offset = keyOffsets[event.key];
-      if (!offset) {
+      if (offset) {
+        nextRow = currentRow + offset.row;
+        nextCol = currentCol + offset.col;
+      } else if (event.key === "Home") {
+        nextCol = 0;
+      } else if (event.key === "End") {
+        nextCol = 7;
+      } else {
         return;
       }
 
       event.preventDefault();
 
-      const nextRow = Math.min(7, Math.max(0, currentRow + offset.row));
-      const nextCol = Math.min(7, Math.max(0, currentCol + offset.col));
+      nextRow = Math.min(7, Math.max(0, nextRow));
+      nextCol = Math.min(7, Math.max(0, nextCol));
 
       const nextSquare = event.currentTarget.querySelector<HTMLElement>(
         `[data-board-square="true"][data-row="${nextRow}"][data-col="${nextCol}"]`,
@@ -224,8 +234,9 @@ const ChessBoard: React.FC = () => {
       </p>
       <p id="chess-board-instructions" className={styles.visuallyHidden}>
         Use Tab to enter or leave the chess board. Press arrow keys to move
-        focus between squares. Press Enter or Space to select a piece or make a
-        valid move.
+        focus between squares. Press Home or End to jump to the start or end of
+        the current row. Press Enter or Space to select a piece or make a valid
+        move.
       </p>
       <div
         className={styles.chessBoard}

@@ -72,7 +72,7 @@ describe("ChessBoard", () => {
     expect(screen.getByText("White to move.").id).toBe("chess-board-status");
     expect(
       screen.getByText(
-        "Use Tab to enter or leave the chess board. Press arrow keys to move focus between squares. Press Enter or Space to select a piece or make a valid move.",
+        "Use Tab to enter or leave the chess board. Press arrow keys to move focus between squares. Press Home or End to jump to the start or end of the current row. Press Enter or Space to select a piece or make a valid move.",
       ).id,
     ).toBe("chess-board-instructions");
 
@@ -144,6 +144,30 @@ describe("ChessBoard", () => {
 
     await user.keyboard("{ArrowUp}{ArrowLeft}");
     expect(document.activeElement).toBe(a8Square);
+  });
+
+  it("should jump to the row start and end with Home and End", async () => {
+    const user = userEvent.setup();
+    render(<ChessBoard />);
+
+    const e4Square = screen.getByRole("gridcell", {
+      name: /e4, empty square/i,
+    });
+    act(() => {
+      e4Square.focus();
+    });
+
+    await user.keyboard("{Home}");
+    expect(document.activeElement).toBe(
+      screen.getByRole("gridcell", { name: /a4, empty square/i }),
+    );
+
+    await user.keyboard("{End}");
+    const h4Square = screen.getByRole("gridcell", {
+      name: /h4, empty square/i,
+    });
+    expect(document.activeElement).toBe(h4Square);
+    expect(h4Square.getAttribute("tabindex")).toBe("0");
   });
 
   it("should use roving tab index so Tab enters the board once", async () => {
