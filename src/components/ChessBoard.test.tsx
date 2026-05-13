@@ -61,10 +61,12 @@ describe("ChessBoard", () => {
   it("should expose board status and keyboard instructions to assistive tech", () => {
     render(<ChessBoard />);
 
-    const board = screen.getByRole("group", { name: "Chess board" });
+    const board = screen.getByRole("grid", { name: "Chess board" });
     expect(board.getAttribute("aria-describedby")).toBe(
       "chess-board-status chess-board-instructions",
     );
+    expect(screen.getAllByRole("row")).toHaveLength(8);
+    expect(screen.getAllByRole("gridcell")).toHaveLength(64);
     expect(screen.getByText("White to move.").id).toBe("chess-board-status");
     expect(
       screen.getByText(
@@ -152,7 +154,9 @@ describe("ChessBoard", () => {
 
     const user = userEvent.setup();
     render(<ChessBoard />);
-    const e2Square = screen.getByRole("button", { name: /e2, white pawn/i });
+    const e2Square = screen.getByRole("gridcell", {
+      name: /e2, white pawn/i,
+    });
 
     await user.click(e2Square);
 
@@ -182,11 +186,11 @@ describe("ChessBoard", () => {
 
     expect(
       screen
-        .getByRole("button", { name: /e2, white pawn, selected/i })
-        .getAttribute("aria-pressed"),
+        .getByRole("gridcell", { name: /e2, white pawn, selected/i })
+        .getAttribute("aria-selected"),
     ).toBe("true");
 
-    const e3Square = screen.getByRole("button", {
+    const e3Square = screen.getByRole("gridcell", {
       name: /e3, empty square, valid move/i,
     });
     e3Square.focus();

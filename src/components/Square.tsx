@@ -83,8 +83,9 @@ const Square: React.FC<SquareProps> = ({
       type="button"
       className={squareClasses}
       onClick={onClick}
+      role="gridcell"
       aria-label={squareLabel}
-      aria-pressed={isSelected}
+      aria-selected={isSelected}
     >
       {piece && (
         <img

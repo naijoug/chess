@@ -34,6 +34,10 @@
   background-color: #fff;
 }
 
+.boardRow {
+  display: contents;
+}
+
 /* 列标记（a-h） */
 .columnLabels {
   position: absolute;
