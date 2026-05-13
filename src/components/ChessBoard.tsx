@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Square from "./Square";
 import { useGame } from "../context/useGame";
 import { positionsEqual } from "../types";
@@ -7,6 +7,10 @@ import styles from "./ChessBoard.module.css";
 
 const ChessBoard: React.FC = () => {
   const { state, dispatch } = useGame();
+  const [focusedSquare, setFocusedSquare] = useState<Position>({
+    row: 0,
+    col: 0,
+  });
 
   // 使用 useCallback 优化事件处理函数，避免每次渲染都创建新函数
   const handleSquareClick = useCallback(
@@ -189,7 +193,9 @@ const ChessBoard: React.FC = () => {
               isLight={isLight}
               isCheck={isCheck}
               isLastMoveSquare={isLastMoveSquare}
+              tabIndex={positionsEqual(focusedSquare, position) ? 0 : -1}
               onClick={() => handleSquareClick(position)}
+              onFocus={() => setFocusedSquare(position)}
             />
           );
         })}
@@ -202,6 +208,7 @@ const ChessBoard: React.FC = () => {
     state.isCheck,
     state.currentTurn,
     state.lastMove,
+    focusedSquare,
     isLightSquare,
     handleSquareClick,
   ]);
@@ -216,8 +223,9 @@ const ChessBoard: React.FC = () => {
         {boardStatusText}
       </p>
       <p id="chess-board-instructions" className={styles.visuallyHidden}>
-        Use Tab to focus a square. Press arrow keys to move focus between
-        squares. Press Enter or Space to select a piece or make a valid move.
+        Use Tab to enter or leave the chess board. Press arrow keys to move
+        focus between squares. Press Enter or Space to select a piece or make a
+        valid move.
       </p>
       <div
         className={styles.chessBoard}

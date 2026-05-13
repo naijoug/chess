@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import ChessBoard from "./ChessBoard";
 import * as GameContext from "../context/useGame";
@@ -72,7 +72,7 @@ describe("ChessBoard", () => {
     expect(screen.getByText("White to move.").id).toBe("chess-board-status");
     expect(
       screen.getByText(
-        "Use Tab to focus a square. Press arrow keys to move focus between squares. Press Enter or Space to select a piece or make a valid move.",
+        "Use Tab to enter or leave the chess board. Press arrow keys to move focus between squares. Press Enter or Space to select a piece or make a valid move.",
       ).id,
     ).toBe("chess-board-instructions");
 
@@ -108,7 +108,9 @@ describe("ChessBoard", () => {
     const e4Square = screen.getByRole("gridcell", {
       name: /e4, empty square/i,
     });
-    e4Square.focus();
+    act(() => {
+      e4Square.focus();
+    });
 
     await user.keyboard("{ArrowUp}");
     expect(document.activeElement).toBe(
@@ -136,10 +138,44 @@ describe("ChessBoard", () => {
     const a8Square = screen.getByRole("gridcell", {
       name: /a8, empty square/i,
     });
-    a8Square.focus();
+    act(() => {
+      a8Square.focus();
+    });
 
     await user.keyboard("{ArrowUp}{ArrowLeft}");
     expect(document.activeElement).toBe(a8Square);
+  });
+
+  it("should use roving tab index so Tab enters the board once", async () => {
+    const user = userEvent.setup();
+    render(<ChessBoard />);
+
+    const gridCells = screen.getAllByRole("gridcell");
+    expect(
+      gridCells.filter((cell) => cell.getAttribute("tabindex") === "0"),
+    ).toHaveLength(1);
+    expect(
+      screen
+        .getByRole("gridcell", { name: /a8, empty square/i })
+        .getAttribute("tabindex"),
+    ).toBe("0");
+
+    await user.tab();
+    expect(document.activeElement).toBe(
+      screen.getByRole("gridcell", { name: /a8, empty square/i }),
+    );
+
+    await user.keyboard("{ArrowRight}");
+    const b8Square = screen.getByRole("gridcell", {
+      name: /b8, empty square/i,
+    });
+    expect(document.activeElement).toBe(b8Square);
+    expect(b8Square.getAttribute("tabindex")).toBe("0");
+    expect(
+      screen
+        .getByRole("gridcell", { name: /a8, empty square/i })
+        .getAttribute("tabindex"),
+    ).toBe("-1");
   });
 
   it("should announce check in the board status", () => {
@@ -256,7 +292,9 @@ describe("ChessBoard", () => {
     const e3Square = screen.getByRole("gridcell", {
       name: /e3, empty square, valid move/i,
     });
-    e3Square.focus();
+    act(() => {
+      e3Square.focus();
+    });
     await user.keyboard("{Enter}");
 
     expect(mockDispatch).toHaveBeenCalledWith({

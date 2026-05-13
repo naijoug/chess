@@ -10,7 +10,9 @@ interface SquareProps {
   isLight: boolean;
   isCheck: boolean; // 是否是被将军的国王
   isLastMoveSquare: boolean; // 是否是上一步移动的格子
+  tabIndex: number;
   onClick: () => void;
+  onFocus: () => void;
 }
 
 const Square: React.FC<SquareProps> = ({
@@ -21,7 +23,9 @@ const Square: React.FC<SquareProps> = ({
   isLight,
   isCheck,
   isLastMoveSquare,
+  tabIndex,
   onClick,
+  onFocus,
 }) => {
   // 获取棋子 SVG 图标路径
   const getPieceIcon = (piece: Piece): string => {
@@ -83,7 +87,9 @@ const Square: React.FC<SquareProps> = ({
       type="button"
       className={squareClasses}
       onClick={onClick}
+      onFocus={onFocus}
       role="gridcell"
+      tabIndex={tabIndex}
       aria-label={squareLabel}
       aria-selected={isSelected}
       aria-rowindex={position.row + 1}
