@@ -5,8 +5,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0;
+  padding: 0;
+  font: inherit;
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.square:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: -3px;
+  z-index: 1;
 }
 
 /* 悬停效果 */
@@ -46,7 +57,9 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* 棋子移动动画 */
@@ -80,7 +93,8 @@
 }
 
 @keyframes checkPulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: inset 0 0 0 3px rgba(255, 0, 0, 0.6);
   }
   50% {
