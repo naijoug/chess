@@ -84,6 +84,46 @@ const ChessBoard: React.FC = () => {
     return String(8 - row); // row 0 对应第 8 行
   }, []);
 
+  const handleBoardKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const activeSquare = event.target as HTMLElement;
+
+      if (activeSquare.getAttribute("role") !== "gridcell") {
+        return;
+      }
+
+      const currentRow = Number(activeSquare.dataset.row);
+      const currentCol = Number(activeSquare.dataset.col);
+
+      if (Number.isNaN(currentRow) || Number.isNaN(currentCol)) {
+        return;
+      }
+
+      const keyOffsets: Record<string, { row: number; col: number }> = {
+        ArrowUp: { row: -1, col: 0 },
+        ArrowDown: { row: 1, col: 0 },
+        ArrowLeft: { row: 0, col: -1 },
+        ArrowRight: { row: 0, col: 1 },
+      };
+
+      const offset = keyOffsets[event.key];
+      if (!offset) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const nextRow = Math.min(7, Math.max(0, currentRow + offset.row));
+      const nextCol = Math.min(7, Math.max(0, currentCol + offset.col));
+
+      const nextSquare = event.currentTarget.querySelector<HTMLElement>(
+        `[data-board-square="true"][data-row="${nextRow}"][data-col="${nextCol}"]`,
+      );
+      nextSquare?.focus();
+    },
+    [],
+  );
+
   const boardStatusText = useMemo(() => {
     if (state.isCheckmate) {
       const winner = state.winner === "white" ? "White" : "Black";
@@ -176,8 +216,8 @@ const ChessBoard: React.FC = () => {
         {boardStatusText}
       </p>
       <p id="chess-board-instructions" className={styles.visuallyHidden}>
-        Use Tab to focus a square. Press Enter or Space to select a piece or
-        make a valid move.
+        Use Tab to focus a square. Press arrow keys to move focus between
+        squares. Press Enter or Space to select a piece or make a valid move.
       </p>
       <div
         className={styles.chessBoard}
@@ -186,6 +226,7 @@ const ChessBoard: React.FC = () => {
         aria-describedby="chess-board-status chess-board-instructions"
         aria-rowcount={8}
         aria-colcount={8}
+        onKeyDown={handleBoardKeyDown}
       >
         {/* 渲染 8x8 棋盘 */}
         {boardSquares}

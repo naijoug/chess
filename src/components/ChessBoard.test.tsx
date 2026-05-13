@@ -72,7 +72,7 @@ describe("ChessBoard", () => {
     expect(screen.getByText("White to move.").id).toBe("chess-board-status");
     expect(
       screen.getByText(
-        "Use Tab to focus a square. Press Enter or Space to select a piece or make a valid move.",
+        "Use Tab to focus a square. Press arrow keys to move focus between squares. Press Enter or Space to select a piece or make a valid move.",
       ).id,
     ).toBe("chess-board-instructions");
 
@@ -99,6 +99,47 @@ describe("ChessBoard", () => {
     });
     expect(h1Square.getAttribute("aria-rowindex")).toBe("8");
     expect(h1Square.getAttribute("aria-colindex")).toBe("8");
+  });
+
+  it("should move focus between squares with arrow keys", async () => {
+    const user = userEvent.setup();
+    render(<ChessBoard />);
+
+    const e4Square = screen.getByRole("gridcell", {
+      name: /e4, empty square/i,
+    });
+    e4Square.focus();
+
+    await user.keyboard("{ArrowUp}");
+    expect(document.activeElement).toBe(
+      screen.getByRole("gridcell", { name: /e5, empty square/i }),
+    );
+
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(
+      screen.getByRole("gridcell", { name: /f5, empty square/i }),
+    );
+
+    await user.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(
+      screen.getByRole("gridcell", { name: /f4, empty square/i }),
+    );
+
+    await user.keyboard("{ArrowLeft}");
+    expect(document.activeElement).toBe(e4Square);
+  });
+
+  it("should keep arrow-key focus inside board boundaries", async () => {
+    const user = userEvent.setup();
+    render(<ChessBoard />);
+
+    const a8Square = screen.getByRole("gridcell", {
+      name: /a8, empty square/i,
+    });
+    a8Square.focus();
+
+    await user.keyboard("{ArrowUp}{ArrowLeft}");
+    expect(document.activeElement).toBe(a8Square);
   });
 
   it("should announce check in the board status", () => {

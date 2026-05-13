@@ -88,6 +88,9 @@ const Square: React.FC<SquareProps> = ({
       aria-selected={isSelected}
       aria-rowindex={position.row + 1}
       aria-colindex={position.col + 1}
+      data-board-square="true"
+      data-row={position.row}
+      data-col={position.col}
     >
       {piece && (
         <img
