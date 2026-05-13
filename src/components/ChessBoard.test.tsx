@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import ChessBoard from "./ChessBoard";
-import * as GameContext from "../context/GameContext";
+import * as GameContext from "../context/useGame";
 import type { GameState } from "../types";
 
 describe("ChessBoard", () => {

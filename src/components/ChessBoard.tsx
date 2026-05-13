@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import Square from "./Square";
-import { useGame } from "../context/GameContext";
+import { useGame } from "../context/useGame";
 import { positionsEqual } from "../types";
 import type { Position } from "../types";
 import styles from "./ChessBoard.module.css";
