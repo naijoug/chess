@@ -65,6 +65,8 @@ describe("ChessBoard", () => {
     expect(board.getAttribute("aria-describedby")).toBe(
       "chess-board-status chess-board-instructions",
     );
+    expect(board.getAttribute("aria-rowcount")).toBe("8");
+    expect(board.getAttribute("aria-colcount")).toBe("8");
     expect(screen.getAllByRole("row")).toHaveLength(8);
     expect(screen.getAllByRole("gridcell")).toHaveLength(64);
     expect(screen.getByText("White to move.").id).toBe("chess-board-status");
@@ -77,6 +79,26 @@ describe("ChessBoard", () => {
     expect(screen.getByText("White to move.").getAttribute("aria-live")).toBe(
       "polite",
     );
+  });
+
+  it("should expose row and column indexes for grid navigation", () => {
+    render(<ChessBoard />);
+
+    const rows = screen.getAllByRole("row");
+    expect(rows[0].getAttribute("aria-rowindex")).toBe("1");
+    expect(rows[7].getAttribute("aria-rowindex")).toBe("8");
+
+    const a8Square = screen.getByRole("gridcell", {
+      name: /a8, empty square/i,
+    });
+    expect(a8Square.getAttribute("aria-rowindex")).toBe("1");
+    expect(a8Square.getAttribute("aria-colindex")).toBe("1");
+
+    const h1Square = screen.getByRole("gridcell", {
+      name: /h1, empty square/i,
+    });
+    expect(h1Square.getAttribute("aria-rowindex")).toBe("8");
+    expect(h1Square.getAttribute("aria-colindex")).toBe("8");
   });
 
   it("should announce check in the board status", () => {

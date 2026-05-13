@@ -86,6 +86,8 @@ const Square: React.FC<SquareProps> = ({
       role="gridcell"
       aria-label={squareLabel}
       aria-selected={isSelected}
+      aria-rowindex={position.row + 1}
+      aria-colindex={position.col + 1}
     >
       {piece && (
         <img

@@ -109,7 +109,12 @@ const ChessBoard: React.FC = () => {
   // 使用 useMemo 缓存棋盘格子的渲染，避免不必要的重新计算
   const boardSquares = useMemo(() => {
     return Array.from({ length: 8 }, (_, row) => (
-      <div key={row} className={styles.boardRow} role="row">
+      <div
+        key={row}
+        className={styles.boardRow}
+        role="row"
+        aria-rowindex={row + 1}
+      >
         {Array.from({ length: 8 }, (_, col) => {
           const position: Position = { row, col };
           const piece = state.board[row][col];
@@ -179,6 +184,8 @@ const ChessBoard: React.FC = () => {
         role="grid"
         aria-label="Chess board"
         aria-describedby="chess-board-status chess-board-instructions"
+        aria-rowcount={8}
+        aria-colcount={8}
       >
         {/* 渲染 8x8 棋盘 */}
         {boardSquares}
