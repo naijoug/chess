@@ -58,6 +58,51 @@ describe("ChessBoard", () => {
     expect(getByText("8")).toBeDefined();
   });
 
+  it("should expose board status and keyboard instructions to assistive tech", () => {
+    render(<ChessBoard />);
+
+    const board = screen.getByRole("group", { name: "Chess board" });
+    expect(board.getAttribute("aria-describedby")).toBe(
+      "chess-board-status chess-board-instructions",
+    );
+    expect(screen.getByText("White to move.").id).toBe("chess-board-status");
+    expect(
+      screen.getByText(
+        "Use Tab to focus a square. Press Enter or Space to select a piece or make a valid move.",
+      ).id,
+    ).toBe("chess-board-instructions");
+
+    expect(screen.getByText("White to move.").getAttribute("aria-live")).toBe(
+      "polite",
+    );
+  });
+
+  it("should announce check in the board status", () => {
+    vi.spyOn(GameContext, "useGame").mockReturnValue({
+      state: createMockState({ currentTurn: "black", isCheck: true }),
+      dispatch: mockDispatch,
+    });
+
+    render(<ChessBoard />);
+
+    expect(screen.getByText("Black to move. Black king is in check.").id).toBe(
+      "chess-board-status",
+    );
+  });
+
+  it("should announce game-ending board status", () => {
+    vi.spyOn(GameContext, "useGame").mockReturnValue({
+      state: createMockState({ isCheckmate: true, winner: "white" }),
+      dispatch: mockDispatch,
+    });
+
+    render(<ChessBoard />);
+
+    expect(screen.getByText("Checkmate. White wins.").id).toBe(
+      "chess-board-status",
+    );
+  });
+
   it("should not handle clicks when game is over (checkmate)", async () => {
     vi.spyOn(GameContext, "useGame").mockReturnValue({
       state: createMockState({ isCheckmate: true }),
