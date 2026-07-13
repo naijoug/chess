@@ -104,6 +104,44 @@ describe('AIEngine', () => {
       expect(move?.piece.color).toBe('black');
     });
 
+    it('should choose a white pawn promotion when it is the highest-value move', () => {
+      const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
+      board[7][4] = { type: 'king', color: 'white', hasMoved: false };
+      board[0][7] = { type: 'king', color: 'black', hasMoved: false };
+      board[1][0] = { type: 'pawn', color: 'white', hasMoved: true };
+
+      const move = AIEngine.calculateBestMove(board, 'white', 1);
+
+      expect(move).toMatchObject({
+        from: { row: 1, col: 0 },
+        to: { row: 0, col: 0 },
+        piece: { type: 'pawn', color: 'white' }
+      });
+
+      const result = ChessEngine.makeMove(board, move!.from, move!.to);
+      expect(result.move.promotionType).toBe('queen');
+      expect(result.newBoard[0][0]).toMatchObject({ type: 'queen', color: 'white', hasMoved: true });
+    });
+
+    it('should choose a black pawn promotion when it is the highest-value move', () => {
+      const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
+      board[0][4] = { type: 'king', color: 'black', hasMoved: false };
+      board[7][0] = { type: 'king', color: 'white', hasMoved: false };
+      board[6][7] = { type: 'pawn', color: 'black', hasMoved: true };
+
+      const move = AIEngine.calculateBestMove(board, 'black', 1);
+
+      expect(move).toMatchObject({
+        from: { row: 6, col: 7 },
+        to: { row: 7, col: 7 },
+        piece: { type: 'pawn', color: 'black' }
+      });
+
+      const result = ChessEngine.makeMove(board, move!.from, move!.to);
+      expect(result.move.promotionType).toBe('queen');
+      expect(result.newBoard[7][7]).toMatchObject({ type: 'queen', color: 'black', hasMoved: true });
+    });
+
     it('should prefer moves with higher material gain', () => {
       const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
       board[4][4] = { type: 'king', color: 'white', hasMoved: false };
