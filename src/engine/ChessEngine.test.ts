@@ -13,7 +13,7 @@ describe('ChessEngine', () => {
     it('should place all 32 pieces correctly', () => {
       const board = ChessEngine.initializeBoard();
       let pieceCount = 0;
-      
+
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
           if (board[row][col] !== null) {
@@ -21,19 +21,19 @@ describe('ChessEngine', () => {
           }
         }
       }
-      
+
       expect(pieceCount).toBe(32);
     });
 
     it('should place white pieces on rows 6 and 7', () => {
       const board = ChessEngine.initializeBoard();
-      
+
       // Check row 6 (white pawns)
       for (let col = 0; col < 8; col++) {
         expect(board[6][col]?.color).toBe('white');
         expect(board[6][col]?.type).toBe('pawn');
       }
-      
+
       // Check row 7 (white major pieces)
       for (let col = 0; col < 8; col++) {
         expect(board[7][col]?.color).toBe('white');
@@ -42,13 +42,13 @@ describe('ChessEngine', () => {
 
     it('should place black pieces on rows 0 and 1', () => {
       const board = ChessEngine.initializeBoard();
-      
+
       // Check row 1 (black pawns)
       for (let col = 0; col < 8; col++) {
         expect(board[1][col]?.color).toBe('black');
         expect(board[1][col]?.type).toBe('pawn');
       }
-      
+
       // Check row 0 (black major pieces)
       for (let col = 0; col < 8; col++) {
         expect(board[0][col]?.color).toBe('black');
@@ -65,7 +65,7 @@ describe('ChessEngine', () => {
 
     it('should set hasMoved to false for all pieces', () => {
       const board = ChessEngine.initializeBoard();
-      
+
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
           const piece = board[row][col];
@@ -139,7 +139,7 @@ describe('ChessEngine', () => {
       const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
       board[0][4] = { type: 'king', color: 'black', hasMoved: false };
       board[7][4] = { type: 'rook', color: 'white', hasMoved: false };
-      
+
       expect(ChessEngine.isInCheck(board, 'black')).toBe(true);
     });
 
@@ -147,7 +147,7 @@ describe('ChessEngine', () => {
       const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
       board[4][4] = { type: 'king', color: 'white', hasMoved: false };
       board[2][2] = { type: 'bishop', color: 'black', hasMoved: false };
-      
+
       expect(ChessEngine.isInCheck(board, 'white')).toBe(true);
     });
 
@@ -155,7 +155,7 @@ describe('ChessEngine', () => {
       const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
       board[4][4] = { type: 'king', color: 'white', hasMoved: false };
       board[2][3] = { type: 'knight', color: 'black', hasMoved: false };
-      
+
       expect(ChessEngine.isInCheck(board, 'white')).toBe(true);
     });
   });
@@ -165,9 +165,9 @@ describe('ChessEngine', () => {
       const board = ChessEngine.initializeBoard();
       const from: Position = { row: 6, col: 4 }; // white pawn
       const to: Position = { row: 4, col: 4 };
-      
+
       const result = ChessEngine.makeMove(board, from, to);
-      
+
       expect(result.newBoard[4][4]?.type).toBe('pawn');
       expect(result.newBoard[4][4]?.color).toBe('white');
       expect(result.newBoard[6][4]).toBeNull();
@@ -177,9 +177,9 @@ describe('ChessEngine', () => {
       const board = ChessEngine.initializeBoard();
       const from: Position = { row: 6, col: 4 };
       const to: Position = { row: 4, col: 4 };
-      
+
       const result = ChessEngine.makeMove(board, from, to);
-      
+
       expect(result.newBoard[4][4]?.hasMoved).toBe(true);
     });
 
@@ -194,9 +194,9 @@ describe('ChessEngine', () => {
       // Capture
       const from: Position = { row: 4, col: 4 };
       const to: Position = { row: 3, col: 5 };
-      
+
       const result = ChessEngine.makeMove(board, from, to);
-      
+
       expect(result.move.capturedPiece).toBeDefined();
       expect(result.move.capturedPiece?.color).toBe('black');
       expect(result.newBoard[3][5]?.color).toBe('white');
@@ -207,14 +207,80 @@ describe('ChessEngine', () => {
       board[1][4] = { type: 'pawn', color: 'white', hasMoved: true };
       board[7][4] = { type: 'king', color: 'black', hasMoved: false };
       board[0][0] = { type: 'king', color: 'white', hasMoved: false };
-      
+
       const from: Position = { row: 1, col: 4 };
       const to: Position = { row: 0, col: 4 };
-      
+
       const result = ChessEngine.makeMove(board, from, to);
-      
+
       expect(result.newBoard[0][4]?.type).toBe('queen');
       expect(result.move.promotionType).toBe('queen');
+    });
+
+    it('should execute kingside castling and move rook', () => {
+      const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
+      board[7][4] = { type: 'king', color: 'white', hasMoved: false };
+      board[7][7] = { type: 'rook', color: 'white', hasMoved: false };
+      board[0][0] = { type: 'king', color: 'black', hasMoved: false };
+
+      const from: Position = { row: 7, col: 4 };
+      const to: Position = { row: 7, col: 6 };
+
+      const result = ChessEngine.makeMove(board, from, to);
+
+      expect(result.move.isCastling).toBe(true);
+      expect(result.newBoard[7][6]?.type).toBe('king');
+      expect(result.newBoard[7][6]?.hasMoved).toBe(true);
+      expect(result.newBoard[7][5]?.type).toBe('rook');
+      expect(result.newBoard[7][5]?.hasMoved).toBe(true);
+      expect(result.newBoard[7][4]).toBeNull();
+      expect(result.newBoard[7][7]).toBeNull();
+    });
+
+    it('should execute queenside castling and move rook', () => {
+      const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
+      board[7][4] = { type: 'king', color: 'white', hasMoved: false };
+      board[7][0] = { type: 'rook', color: 'white', hasMoved: false };
+      board[0][7] = { type: 'king', color: 'black', hasMoved: false };
+
+      const from: Position = { row: 7, col: 4 };
+      const to: Position = { row: 7, col: 2 };
+
+      const result = ChessEngine.makeMove(board, from, to);
+
+      expect(result.move.isCastling).toBe(true);
+      expect(result.newBoard[7][2]?.type).toBe('king');
+      expect(result.newBoard[7][3]?.type).toBe('rook');
+      expect(result.newBoard[7][3]?.hasMoved).toBe(true);
+      expect(result.newBoard[7][4]).toBeNull();
+      expect(result.newBoard[7][0]).toBeNull();
+    });
+
+    it('should execute en passant and remove captured pawn', () => {
+      const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
+      board[3][4] = { type: 'pawn', color: 'white', hasMoved: true };
+      board[3][5] = { type: 'pawn', color: 'black', hasMoved: true };
+      board[0][0] = { type: 'king', color: 'white', hasMoved: false };
+      board[7][4] = { type: 'king', color: 'black', hasMoved: false };
+
+      const lastMove = {
+        from: { row: 1, col: 5 },
+        to: { row: 3, col: 5 },
+        piece: { type: 'pawn' as const, color: 'black' as const, hasMoved: false }
+      };
+
+      const from: Position = { row: 3, col: 4 };
+      const to: Position = { row: 2, col: 5 };
+
+      const result = ChessEngine.makeMove(board, from, to, lastMove);
+
+      expect(result.move.isEnPassant).toBe(true);
+      expect(result.newBoard[2][5]?.type).toBe('pawn');
+      expect(result.newBoard[2][5]?.color).toBe('white');
+      expect(result.newBoard[3][5]).toBeNull(); // captured pawn removed
+      expect(result.newBoard[3][4]).toBeNull(); // source emptied
+      expect(result.move.capturedPiece?.type).toBe('pawn');
+      expect(result.move.capturedPiece?.color).toBe('black');
     });
   });
 
@@ -232,7 +298,7 @@ describe('ChessEngine', () => {
       board[1][7] = { type: 'pawn', color: 'black', hasMoved: true };
       board[0][4] = { type: 'rook', color: 'white', hasMoved: false };
       board[7][0] = { type: 'king', color: 'white', hasMoved: false };
-      
+
       expect(ChessEngine.isCheckmate(board, 'black')).toBe(true);
     });
   });
@@ -249,7 +315,7 @@ describe('ChessEngine', () => {
       board[0][0] = { type: 'king', color: 'black', hasMoved: true };
       board[1][2] = { type: 'queen', color: 'white', hasMoved: true };
       board[2][1] = { type: 'king', color: 'white', hasMoved: true };
-      
+
       expect(ChessEngine.isStalemate(board, 'black')).toBe(true);
     });
   });
@@ -260,7 +326,7 @@ describe('ChessEngine', () => {
       // Clear pieces between king and rook
       board[7][5] = null;
       board[7][6] = null;
-      
+
       expect(ChessEngine.canCastle(board, 'white', 'kingside')).toBe(true);
     });
 
@@ -269,7 +335,7 @@ describe('ChessEngine', () => {
       board[7][5] = null;
       board[7][6] = null;
       board[7][4]!.hasMoved = true;
-      
+
       expect(ChessEngine.canCastle(board, 'white', 'kingside')).toBe(false);
     });
 
@@ -278,7 +344,7 @@ describe('ChessEngine', () => {
       board[7][5] = null;
       board[7][6] = null;
       board[7][7]!.hasMoved = true;
-      
+
       expect(ChessEngine.canCastle(board, 'white', 'kingside')).toBe(false);
     });
 
@@ -289,8 +355,37 @@ describe('ChessEngine', () => {
       board[0][0] = { type: 'king', color: 'black', hasMoved: false };
       // Place black rook attacking f1 (row 7, col 5)
       board[0][5] = { type: 'rook', color: 'black', hasMoved: false };
-      
+
       expect(ChessEngine.canCastle(board, 'white', 'kingside')).toBe(false);
+    });
+
+    it('should allow queenside castling when conditions are met', () => {
+      const board = ChessEngine.initializeBoard();
+      board[7][1] = null;
+      board[7][2] = null;
+      board[7][3] = null;
+
+      expect(ChessEngine.canCastle(board, 'white', 'queenside')).toBe(true);
+    });
+
+    it('should not allow queenside castling if blocked', () => {
+      const board = ChessEngine.initializeBoard();
+      board[7][2] = null;
+      board[7][3] = null;
+      // Leave bishop at b1
+
+      expect(ChessEngine.canCastle(board, 'white', 'queenside')).toBe(false);
+    });
+
+    it('should not allow queenside castling through check', () => {
+      const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
+      board[7][4] = { type: 'king', color: 'white', hasMoved: false };
+      board[7][0] = { type: 'rook', color: 'white', hasMoved: false };
+      board[0][7] = { type: 'king', color: 'black', hasMoved: false };
+      // Place black rook attacking d1 (row 7, col 3)
+      board[0][3] = { type: 'rook', color: 'black', hasMoved: false };
+
+      expect(ChessEngine.canCastle(board, 'white', 'queenside')).toBe(false);
     });
   });
 
@@ -308,10 +403,10 @@ describe('ChessEngine', () => {
       };
       board[3][5] = { type: 'pawn', color: 'black', hasMoved: true };
       board[1][5] = null;
-      
+
       const from: Position = { row: 3, col: 4 };
       const to: Position = { row: 2, col: 5 };
-      
+
       expect(ChessEngine.canEnPassant(board, from, to, lastMove)).toBe(true);
     });
 
@@ -322,10 +417,10 @@ describe('ChessEngine', () => {
         to: { row: 2, col: 2 },
         piece: { type: 'knight' as const, color: 'black' as const, hasMoved: false }
       };
-      
+
       const from: Position = { row: 3, col: 4 };
       const to: Position = { row: 2, col: 5 };
-      
+
       expect(ChessEngine.canEnPassant(board, from, to, lastMove)).toBe(false);
     });
   });
@@ -334,7 +429,7 @@ describe('ChessEngine', () => {
     it('should return valid moves for white pawn at start', () => {
       const board = ChessEngine.initializeBoard();
       const moves = ChessEngine.getValidMoves(board, { row: 6, col: 4 });
-      
+
       expect(moves).toHaveLength(2);
       expect(moves).toContainEqual({ row: 5, col: 4 });
       expect(moves).toContainEqual({ row: 4, col: 4 });
@@ -343,7 +438,7 @@ describe('ChessEngine', () => {
     it('should return valid moves for knight', () => {
       const board = ChessEngine.initializeBoard();
       const moves = ChessEngine.getValidMoves(board, { row: 7, col: 1 });
-      
+
       expect(moves).toHaveLength(2);
       expect(moves).toContainEqual({ row: 5, col: 0 });
       expect(moves).toContainEqual({ row: 5, col: 2 });
@@ -355,9 +450,9 @@ describe('ChessEngine', () => {
       board[4][5] = { type: 'rook', color: 'white', hasMoved: false };
       board[4][7] = { type: 'rook', color: 'black', hasMoved: false };
       board[0][0] = { type: 'king', color: 'black', hasMoved: false };
-      
+
       const moves = ChessEngine.getValidMoves(board, { row: 4, col: 5 });
-      
+
       // Rook can capture the attacking rook or block, but cannot move away
       // It should be able to capture the black rook at (4,7) or move to (4,6)
       expect(moves.length).toBeGreaterThan(0);
