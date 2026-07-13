@@ -76,7 +76,7 @@ export class AIEngine {
   static calculateBestMove(board: Board, color: PieceColor, depth: number = 3): Move | null {
     let bestMove: Move | null = null;
     let bestValue = -Infinity;
-    const alpha = -Infinity;
+    let alpha = -Infinity;
     const beta = Infinity;
 
     // 获取所有可能的移动
@@ -107,6 +107,7 @@ export class AIEngine {
         bestValue = value;
         bestMove = move;
       }
+      alpha = Math.max(alpha, bestValue);
     }
 
     return bestMove;
