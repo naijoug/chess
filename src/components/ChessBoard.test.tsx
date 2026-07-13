@@ -228,6 +228,20 @@ describe("ChessBoard", () => {
     );
   });
 
+  it("should not announce black as winner when checkmate winner is missing", () => {
+    vi.spyOn(GameContext, "useGame").mockReturnValue({
+      state: createMockState({ isCheckmate: true, winner: null }),
+      dispatch: mockDispatch,
+    });
+
+    render(<ChessBoard />);
+
+    expect(screen.getByText("Checkmate. Winner unknown.").id).toBe(
+      "chess-board-status",
+    );
+    expect(screen.queryByText("Checkmate. Black wins.")).toBeNull();
+  });
+
   it("should not handle clicks when game is over (checkmate)", async () => {
     vi.spyOn(GameContext, "useGame").mockReturnValue({
       state: createMockState({ isCheckmate: true }),

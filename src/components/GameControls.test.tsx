@@ -83,6 +83,19 @@ describe("GameControls", () => {
     expect(screen.getByText("将死")).toBeDefined();
   });
 
+  it("should not show black victory when checkmate winner is missing", () => {
+    vi.spyOn(GameContext, "useGame").mockReturnValue({
+      state: createMockState({ isCheckmate: true, winner: null }),
+      dispatch: mockDispatch,
+    });
+
+    render(<GameControls />);
+
+    expect(screen.getByText("胜负未定")).toBeDefined();
+    expect(screen.queryByText("黑方胜利！")).toBeNull();
+    expect(screen.getByText("将死")).toBeDefined();
+  });
+
   it("should display stalemate status", () => {
     vi.spyOn(GameContext, "useGame").mockReturnValue({
       state: createMockState({ isStalemate: true, winner: "draw" }),

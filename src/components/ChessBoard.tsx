@@ -140,7 +140,15 @@ const ChessBoard: React.FC = () => {
 
   const boardStatusText = useMemo(() => {
     if (state.isCheckmate) {
-      const winner = state.winner === "white" ? "White" : "Black";
+      const winner =
+        state.winner === "white"
+          ? "White"
+          : state.winner === "black"
+            ? "Black"
+            : null;
+      if (!winner) {
+        return "Checkmate. Winner unknown.";
+      }
       return `Checkmate. ${winner} wins.`;
     }
 

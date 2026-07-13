@@ -11,7 +11,13 @@ export function GameControls() {
   // 获取当前回合显示文本
   const getTurnText = () => {
     if (state.isCheckmate) {
-      return state.winner === "white" ? "白方胜利！" : "黑方胜利！";
+      if (state.winner === "white") {
+        return "白方胜利！";
+      }
+      if (state.winner === "black") {
+        return "黑方胜利！";
+      }
+      return "胜负未定";
     }
     if (state.isStalemate) {
       return "和棋！";
