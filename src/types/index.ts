@@ -6,6 +6,9 @@ export type PieceColor = 'white' | 'black';
 // 棋子类型
 export type PieceType = 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
 
+// 兵升变只能选择后、车、象、马，不能升变为王或兵
+export type PromotionPieceType = Exclude<PieceType, 'king' | 'pawn'>;
+
 // 棋子
 export interface Piece {
   type: PieceType;
